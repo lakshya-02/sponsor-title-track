@@ -32,15 +32,13 @@ public class Manager : MonoBehaviour
     [SerializeField] private TMP_Text statusText;
     
     [Header("Model Prefabs - Class 6")]
-    [SerializeField] private GameObject solarSystemModel;
-    [SerializeField] private GameObject plantCellModel;
+    [SerializeField] private GameObject volcanoModel;      // Volcano - Geography/Science
     
     [Header("Model Prefabs - Class 7")]
-    [SerializeField] private GameObject digestiveSystemModel;
-    [SerializeField] private GameObject waterCycleModel;
+    [SerializeField] private GameObject brainModel;        // Brain - Biology
     
     [Header("Model Prefabs - Class 8")]
-    [SerializeField] private GameObject atomModel;
+    [SerializeField] private GameObject skeletonModel;     // Skeleton - Biology/Anatomy
     
     // Model data structure
     [System.Serializable]
@@ -66,21 +64,17 @@ public class Manager : MonoBehaviour
     
     void InitializeModels()
     {
-        // Class 6 models
-        if (solarSystemModel != null)
-            allModels.Add(new ModelData { name = "Solar System", prefab = solarSystemModel, classLevel = 6 });
-        if (plantCellModel != null)
-            allModels.Add(new ModelData { name = "Plant Cell", prefab = plantCellModel, classLevel = 6 });
+        // Class 6 models - Geography/Earth Science
+        if (volcanoModel != null)
+            allModels.Add(new ModelData { name = "Volcano", prefab = volcanoModel, classLevel = 6 });
         
-        // Class 7 models
-        if (digestiveSystemModel != null)
-            allModels.Add(new ModelData { name = "Digestive System", prefab = digestiveSystemModel, classLevel = 7 });
-        if (waterCycleModel != null)
-            allModels.Add(new ModelData { name = "Water Cycle", prefab = waterCycleModel, classLevel = 7 });
+        // Class 7 models - Biology
+        if (brainModel != null)
+            allModels.Add(new ModelData { name = "Human Brain", prefab = brainModel, classLevel = 7 });
         
-        // Class 8 models
-        if (atomModel != null)
-            allModels.Add(new ModelData { name = "Atom Structure", prefab = atomModel, classLevel = 8 });
+        // Class 8 models - Anatomy
+        if (skeletonModel != null)
+            allModels.Add(new ModelData { name = "Human Skeleton", prefab = skeletonModel, classLevel = 8 });
     }
     
     void SetupUI()

@@ -330,40 +330,97 @@ With `GameManager` selected, drag these references into the Manager script Inspe
 
 ---
 
-## STEP 9: Generate Placeholder Models
+## STEP 9: Prepare the 3D Models as Prefabs
 
-1. Right-click in Hierarchy → **Create Empty**
-2. Rename to `ModelGenerator`
-3. Add Component → `PlaceholderModelGenerator`
-4. In Inspector, **right-click** the script header → **Generate All Placeholder Models**
-5. You'll see 5 new GameObjects created in the scene
+You have 3 real 3D models downloaded in `Assets/models/`:
 
-### Save as Prefabs
-1. In Project window, go to `Assets/Prefabs` folder
-2. Drag each generated model from Hierarchy into the Prefabs folder:
-   - `SolarSystem_Placeholder`
-   - `PlantCell_Placeholder`
-   - `DigestiveSystem_Placeholder`
-   - `WaterCycle_Placeholder`
-   - `Atom_Placeholder`
-3. Delete the objects from the scene (they're now saved as prefabs)
-4. Delete the `ModelGenerator` object too
+| Model | File Location | Class | Topic |
+|-------|---------------|-------|-------|
+| **Volcano** | `Assets/models/volcano-/source/Volcano_unity_fbx.fbx` | Class 6 | Geography/Earth Science |
+| **Brain** | `Assets/models/brain-project/BrainColourExport.fbx` | Class 7 | Biology |
+| **Skeleton** | `Assets/models/skeleton/source/SubTool-0-3517926.OBJ` | Class 8 | Anatomy |
+
+### 9.1 Create Prefabs from Models
+
+#### Volcano Prefab
+1. In Project window, navigate to `Assets/models/volcano-/source/`
+2. Click on `Volcano_unity_fbx.fbx`
+3. In Inspector, check import settings:
+   - Scale Factor: `0.01` (adjust if too big/small)
+   - Click **Apply**
+4. Drag `Volcano_unity_fbx` into the Scene
+5. With it selected, click **Add Component** → `ARModelInteraction`
+6. Rename to `Volcano_Prefab`
+7. Drag from Hierarchy into `Assets/Prefabs/` folder
+8. Delete from scene
+
+#### Brain Prefab
+1. Navigate to `Assets/models/brain-project/`
+2. Click on `BrainColourExport.fbx`
+3. In Inspector:
+   - Scale Factor: `0.01`
+   - Click **Apply**
+4. Drag into Scene
+5. Add Component → `ARModelInteraction`
+6. Rename to `Brain_Prefab`
+7. Drag to `Assets/Prefabs/`
+8. Delete from scene
+
+#### Skeleton Prefab
+1. Navigate to `Assets/models/skeleton/source/`
+2. Click on `SubTool-0-3517926.OBJ`
+3. **Important:** This is high-poly! In Inspector:
+   - Scale Factor: `0.001` (very small - it's a large model)
+   - Click **Apply**
+4. Drag into Scene
+5. Add Component → `ARModelInteraction`
+6. Rename to `Skeleton_Prefab`
+7. Drag to `Assets/Prefabs/`
+8. Delete from scene
+
+### 9.2 Apply Textures (if needed)
+
+#### Volcano Textures
+1. In Project: `Assets/models/volcano-/textures/`
+2. Create Material: Right-click → Create → Material
+3. Name it `Volcano_Mat`
+4. Drag `unwr_4.jpg` to Albedo
+5. Drag `unwr_4_-normalmap.jpg` to Normal Map
+6. Apply material to Volcano prefab
+
+#### Brain Texture
+1. In Project: `Assets/models/brain-project/textures/`
+2. Create Material: `Brain_Mat`
+3. Drag `Brain_Texture.jpeg` to Albedo
+4. Apply to Brain prefab
+
+#### Skeleton
+- The OBJ may not have textures - it will appear gray/white which is fine for anatomy
 
 ---
 
 ## STEP 10: Assign Model Prefabs to Manager
 
-1. Select `GameManager`
-2. In Manager script, find the Model Prefabs sections
-3. Drag from `Assets/Prefabs`:
+1. Select `GameManager` in Hierarchy
+2. In Manager script Inspector, find the Model Prefabs sections
+3. Drag prefabs from `Assets/Prefabs/`:
 
-| Field | Prefab |
-|-------|--------|
-| Solar System Model | SolarSystem_Placeholder |
-| Plant Cell Model | PlantCell_Placeholder |
-| Digestive System Model | DigestiveSystem_Placeholder |
-| Water Cycle Model | WaterCycle_Placeholder |
-| Atom Model | Atom_Placeholder |
+| Inspector Field | Drag This Prefab |
+|-----------------|------------------|
+| **Volcano Model** (Class 6) | `Volcano_Prefab` |
+| **Brain Model** (Class 7) | `Brain_Prefab` |
+| **Skeleton Model** (Class 8) | `Skeleton_Prefab` |
+
+### Model Scale Tips
+If models appear too big or small in AR:
+- Select the prefab in `Assets/Prefabs/`
+- Adjust the root Transform scale
+- Or modify the FBX/OBJ import Scale Factor
+
+**Recommended AR scales:**
+- Volcano: `0.05` - `0.1` (table-top size)
+- Brain: `0.1` - `0.2` (hand-held size)
+- Skeleton: `0.3` - `0.5` (larger for detail)
 
 ---
 
@@ -388,8 +445,10 @@ The `BackToIntroButton` in OptionsCanvas needs a listener:
 2. You should see:
    - Intro screen with START and EXIT buttons
    - Click START → Options screen appears
-   - Select Class 6 → Model dropdown populates
-   - Select Solar System → Click "View in AR"
+   - Select Class 6 → "Volcano" appears in model dropdown
+   - Select Class 7 → "Human Brain" appears
+   - Select Class 8 → "Human Skeleton" appears
+   - Select a model → Click "View in AR"
    - AR view appears (use XR Simulation to test placement)
 
 ### Enable XR Simulation (Editor Testing)
@@ -397,6 +456,11 @@ The `BackToIntroButton` in OptionsCanvas needs a listener:
 2. Select a simulation environment
 3. Use WASD to move, mouse to look around
 4. Click on detected planes to place models
+
+### Test Model Interaction
+- Single finger drag: Rotate model
+- Pinch (two fingers): Scale model
+- In Editor: Mouse drag to rotate, scroll wheel to scale
 
 ---
 
@@ -491,13 +555,20 @@ SampleScene
 | Task | Time |
 |------|------|
 | Steps 1-6 (UI Setup) | 2-3 hours |
-| Steps 7-10 (Wiring) | 30 min |
-| Step 11-12 (Testing) | 1 hour |
+| Steps 7-8 (Wiring Manager) | 30 min |
+| Step 9 (Prepare Prefabs) | 30-45 min |
+| Step 10 (Assign to Manager) | 10 min |
+| Steps 11-12 (Testing) | 1 hour |
 | Step 13 (Android Build) | 1-2 hours |
-| **Total** | **4-6 hours** |
+| **Total** | **5-7 hours** |
 
-This leaves you 24+ hours for:
-- Replacing placeholder models with real 3D models
+**Models included:**
+- ✅ Volcano (Geography/Earth Science)
+- ✅ Human Brain (Biology)
+- ✅ Human Skeleton (Anatomy)
+
+This leaves you 23+ hours for:
 - UI polish and animations
 - Testing on multiple devices
-- Adding more models/classes
+- Adding more models if needed
+- Adding labels/info panels for each model
