@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
 using TMPro;
 using UnityEngine.UI;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class Manager : MonoBehaviour
 {
@@ -245,33 +248,43 @@ public class Manager : MonoBehaviour
         }
     }
     
+    void OnEnable()
+    {
+        EnhancedTouchSupport.Enable();
+    }
+    
+    void OnDisable()
+    {
+        EnhancedTouchSupport.Disable();
+    }
+    
     void Update()
     {
         if (!isPlacementMode) return;
         
-        // Handle touch input for model placement
-        if (Input.touchCount > 0)
+        // Handle touch input for model placement (New Input System)
+        if (Touch.activeTouches.Count > 0)
         {
-            Touch touch = Input.GetTouch(0);
+            Touch touch = Touch.activeTouches[0];
             
-            if (touch.phase == TouchPhase.Began)
+            if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
             {
                 // Check if touch is over UI
-                if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+                if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(touch.touchId))
                     return;
                 
-                TryPlaceModel(touch.position);
+                TryPlaceModel(touch.screenPosition);
             }
         }
         
-        // Mouse input for editor testing
+        // Mouse input for editor testing (New Input System)
         #if UNITY_EDITOR
-        if (Input.GetMouseButtonDown(0))
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
                 return;
             
-            TryPlaceModel(Input.mousePosition);
+            TryPlaceModel(Mouse.current.position.ReadValue());
         }
         #endif
     }

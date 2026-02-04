@@ -1,4 +1,7 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class ARModelInteraction : MonoBehaviour
 {
@@ -21,6 +24,16 @@ public class ARModelInteraction : MonoBehaviour
     private bool isRotating = false;
     private bool isScaling = false;
     
+    void OnEnable()
+    {
+        EnhancedTouchSupport.Enable();
+    }
+    
+    void OnDisable()
+    {
+        EnhancedTouchSupport.Disable();
+    }
+    
     void Update()
     {
         // Auto rotation
@@ -38,37 +51,37 @@ public class ARModelInteraction : MonoBehaviour
     
     void HandleTouchInput()
     {
-        if (Input.touchCount == 1 && enableRotation)
+        if (Touch.activeTouches.Count == 1 && enableRotation)
         {
             // Single finger rotation
-            Touch touch = Input.GetTouch(0);
+            Touch touch = Touch.activeTouches[0];
             
-            if (touch.phase == TouchPhase.Began)
+            if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
             {
-                previousTouchPosition = touch.position;
+                previousTouchPosition = touch.screenPosition;
                 isRotating = true;
             }
-            else if (touch.phase == TouchPhase.Moved && isRotating)
+            else if (touch.phase == UnityEngine.InputSystem.TouchPhase.Moved && isRotating)
             {
-                Vector2 delta = touch.position - previousTouchPosition;
+                Vector2 delta = touch.screenPosition - previousTouchPosition;
                 float rotationX = delta.x * rotationSpeed;
                 transform.Rotate(Vector3.up, -rotationX, Space.World);
-                previousTouchPosition = touch.position;
+                previousTouchPosition = touch.screenPosition;
             }
-            else if (touch.phase == TouchPhase.Ended)
+            else if (touch.phase == UnityEngine.InputSystem.TouchPhase.Ended)
             {
                 isRotating = false;
             }
         }
-        else if (Input.touchCount == 2 && enableScale)
+        else if (Touch.activeTouches.Count == 2 && enableScale)
         {
             // Two finger pinch to scale
-            Touch touch0 = Input.GetTouch(0);
-            Touch touch1 = Input.GetTouch(1);
+            Touch touch0 = Touch.activeTouches[0];
+            Touch touch1 = Touch.activeTouches[1];
             
-            float currentPinchDistance = Vector2.Distance(touch0.position, touch1.position);
+            float currentPinchDistance = Vector2.Distance(touch0.screenPosition, touch1.screenPosition);
             
-            if (touch0.phase == TouchPhase.Began || touch1.phase == TouchPhase.Began)
+            if (touch0.phase == UnityEngine.InputSystem.TouchPhase.Began || touch1.phase == UnityEngine.InputSystem.TouchPhase.Began)
             {
                 previousPinchDistance = currentPinchDistance;
                 isScaling = true;
@@ -96,17 +109,18 @@ public class ARModelInteraction : MonoBehaviour
     void HandleMouseInput()
     {
         // Mouse drag for rotation (Editor testing)
-        if (Input.GetMouseButton(0) && enableRotation)
+        if (Mouse.current != null && Mouse.current.leftButton.isPressed && enableRotation)
         {
-            float rotationX = Input.GetAxis("Mouse X") * rotationSpeed * 10f;
+            Vector2 mouseDelta = Mouse.current.delta.ReadValue();
+            float rotationX = mouseDelta.x * rotationSpeed * 0.5f;
             transform.Rotate(Vector3.up, -rotationX, Space.World);
         }
         
         // Scroll wheel for scale (Editor testing)
-        if (enableScale)
+        if (enableScale && Mouse.current != null)
         {
-            float scroll = Input.GetAxis("Mouse ScrollWheel");
-            if (Mathf.Abs(scroll) > 0.01f)
+            float scroll = Mouse.current.scroll.ReadValue().y * 0.001f;
+            if (Mathf.Abs(scroll) > 0.0001f)
             {
                 Vector3 newScale = transform.localScale + Vector3.one * scroll;
                 newScale = Vector3.Max(newScale, Vector3.one * minScale);
